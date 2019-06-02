@@ -318,6 +318,7 @@ protected:
 
   virtual void update()
   {
+
   }
 
   virtual void onMouseButton(int button, int action, int mods)
@@ -481,6 +482,13 @@ public:
 class RiftApp : public GlfwApp, public RiftManagerApp
 {
 public:
+	bool pressedA = false;
+	bool pressedB = false;
+	bool pressedX = false;
+	bool pressedRIdx = false;
+	bool pressedLHnd = false;
+	bool pressedRHnd = false;
+	bool pressedLIdx = false;
 
 private:
   GLuint _fbo{0};
@@ -533,6 +541,112 @@ public:
   }
 
 protected:
+	void update() final override {
+		ovrInputState inputState;
+		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
+			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)
+				std::cerr << "right middle trigger pressed" << std::endl;
+			if (inputState.HandTrigger[ovrHand_Left] > 0.5f)
+				std::cerr << "left middle trigger pressed" << std::endl;
+			if (inputState.IndexTrigger[ovrHand_Left] > 0.5f)
+				std::cerr << "left index trigger pressed" << std::endl;*/
+
+				/*
+				if (inputState.Buttons == ovrButton_B)
+				{
+					if (!pressedB) {
+						// Handle B button being pressed
+						headTrack = (headTrack + 1) % 4;
+						headTrackChanged = 1;
+						std::cerr << "Botton B" << std::endl;
+					}
+					pressedB = true;
+				}
+				else {
+					pressedB = false;
+				}
+				if (inputState.Buttons == ovrButton_X)
+				{
+					if (!pressedX) {
+						// Handle X button being pressed
+						sky_cube = (sky_cube + 1) % 3;
+						std::cerr << "Botton X" << std::endl;
+					}
+					pressedX = true;
+				}
+				else {
+					pressedX = false;
+				}
+
+				if (inputState.IndexTrigger[ovrHand_Right] > 0.5f) {
+					if (!pressedRIdx && lag < frameNum - 1) {
+						// Handle X button being pressed
+						lag++;
+						std::cerr << "Tracking lag:" << lag << "frames" << std::endl;
+					}
+					pressedRIdx = true;
+				}
+				else {
+					pressedRIdx = false;
+				}
+				if (inputState.IndexTrigger[ovrHand_Left] > 0.5f) {
+					if (!pressedLIdx && lag > 0) {
+						// Handle X button being pressed
+						lag--;
+						std::cerr << "Tracking lag:" << lag << "frames" << std::endl;
+					}
+					pressedLIdx = true;
+				}
+				else {
+					pressedLIdx = false;
+				}
+
+				if (inputState.HandTrigger[ovrHand_Right] > 0.5f) {
+					if (!pressedRHnd && renderLag < 10) {
+						// Handle X button being pressed
+						renderLag++;
+						std::cerr << "Rendering lag:" << renderLag << "frames" << std::endl;
+					}
+					pressedRHnd = true;
+				}
+				else {
+					pressedRHnd = false;
+				}
+				if (inputState.HandTrigger[ovrHand_Left] > 0.5f) {
+					if (!pressedLHnd && renderLag > 0) {
+						// Handle X button being pressed
+						renderLag--;
+						std::cerr << "Rendering lag:" << renderLag << "frames" << std::endl;
+					}
+					pressedLHnd = true;
+				}
+				else {
+					pressedLHnd = false;
+				}
+				*/
+
+			if (inputState.IndexTrigger[ovrHand_Right] > 0.5f) {
+				if (!pressedRIdx) {
+					std::cerr << "triggered" << std::endl;
+				}
+				pressedRIdx = true;
+			}
+			else {
+				pressedRIdx = false;
+			}
+
+		}
+		else {
+			//pressedA = false;
+			//pressedB = false;
+			//pressedX = false;
+			pressedRIdx = false;
+			//pressedLIdx = false;
+			//pressedRHnd = false;
+			//pressedLHnd = false;
+		}
+	}
+
   GLFWwindow* createRenderingTarget(uvec2& outSize, ivec2& outPosition) override
   {
     return glfw::createWindow(_mirrorSize);
@@ -661,6 +775,7 @@ protected:
 #include <vector>
 #include "shader.h"
 #include "Cube.h"
+#include "Model.h"
 
 // a class for building and rendering cubes
 class Scene
@@ -669,6 +784,9 @@ class Scene
   std::vector<glm::mat4> instance_positions;
   GLuint instanceCount;
   GLuint shaderID;
+
+
+  Model * sphere;
 
   std::unique_ptr<TexturedCube> cube;
   std::unique_ptr<Skybox> skybox;
@@ -689,6 +807,9 @@ public:
 
     cube = std::make_unique<TexturedCube>("cube"); 
 
+	//sphere
+	sphere = new Model("sphere2.obj");
+
 	  // 10m wide sky box: size doesn't matter though
     skybox = std::make_unique<Skybox>("skybox");
 	  skybox->toWorld = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
@@ -706,6 +827,14 @@ public:
 
     // Render Skybox : remove view translation
     skybox->draw(shaderID, projection, view);
+
+
+	glUseProgram(shaderID);
+	glm::mat4 sphereToWorld = glm::mat4(1);
+	glUniformMatrix4fv(glGetUniformLocation(shaderID2, "modelview"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderID2, "projection"), 1, GL_FALSE, &(projection)[0][0]);
+	sphere->Draw(shaderID); 
+	glUseProgram(shaderID); //set back to default shaderID
   }
 };
 
