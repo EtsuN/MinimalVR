@@ -808,7 +808,7 @@ public:
     cube = std::make_unique<TexturedCube>("cube"); 
 
 	//sphere
-	sphere = new Model("sphere2.obj");
+	//sphere = new Model("sphere2.obj");
 
 	  // 10m wide sky box: size doesn't matter though
     skybox = std::make_unique<Skybox>("skybox");
@@ -833,7 +833,7 @@ public:
 	glm::mat4 sphereToWorld = glm::mat4(1);
 	glUniformMatrix4fv(glGetUniformLocation(shaderID, "modelview"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, &(projection)[0][0]);
-	sphere->Draw(shaderID); 
+	//sphere->Draw(shaderID); 
 	glUseProgram(shaderID); //set back to default shaderID
   }
 };
