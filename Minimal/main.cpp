@@ -831,8 +831,8 @@ public:
 
 	glUseProgram(shaderID);
 	glm::mat4 sphereToWorld = glm::mat4(1);
-	glUniformMatrix4fv(glGetUniformLocation(shaderID2, "modelview"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderID2, "projection"), 1, GL_FALSE, &(projection)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderID, "modelview"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, &(projection)[0][0]);
 	sphere->Draw(shaderID); 
 	glUseProgram(shaderID); //set back to default shaderID
   }
