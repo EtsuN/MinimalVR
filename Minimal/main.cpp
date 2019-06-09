@@ -824,9 +824,25 @@ class Scene
 	mat4 mace_sphere_trans;
 	mat4 sword_sphere_trans;
 
-	mat4 mace_sphere;
-	mat4 axe_sphere;
-	mat4 sword_sphere;
+	mat4 axe_collision_trans;
+	mat4 mace_collision_trans;
+	mat4 sword_collision_trans;
+
+	vector<mat4> axe_collision;
+	vector<mat4> mace_collision;
+	vector<mat4> sword_collision;
+
+	vector<mat4> mace_sphere;
+	vector<mat4> axe_sphere;
+	vector<mat4> sword_sphere;
+
+	vec3 mace_head;
+	vec3 axe_head;
+	vec3 sword_head;
+
+	float axe_head_radius;
+	float mace_head_radius;
+	float sword_head_radius;
 
 	vector<mat4> axe_rots;
 	vector<mat4> mace_rots;
@@ -846,7 +862,8 @@ class Scene
 		a_none, a_mace, a_axe, a_sword
 	};
 
-	attach weapon;
+	attach weapon_p1;
+	attach weapon_p2;
 
 	bool prev_frame_idx;
 
@@ -879,27 +896,55 @@ public:
 		mace_handle = vec3(0.005, -0.2, 0);
 		sword_handle = vec3(-0.005, -0.22, 0);
 
+		axe_head = vec3(0, 0.3, 0);
+		mace_head = vec3(0, 0.42, 0);
+
 		axes.push_back(glm::rotate(90 * pi / 180.0f, vec3(1, 0, 0))* glm::rotate(180 * pi / 180.0f, vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1));
-		axes.push_back(mat4(1.0f));
+		axes.push_back(glm::rotate(90 * pi / 180.0f, vec3(1, 0, 0))* glm::rotate(180 * pi / 180.0f, vec3(0, 0, 1)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1));
 
 		maces.push_back(glm::rotate(90 * pi / 180.0f, vec3(1, 0, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.7f)) * glm::mat4(1));
-		maces.push_back(mat4(1.0f));
+		maces.push_back(glm::rotate(90 * pi / 180.0f, vec3(1, 0, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.7f)) * glm::mat4(1));
 
 		swords.push_back(glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)) * glm::mat4(1));
-		swords.push_back(mat4(1.0f));
+		swords.push_back(glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)) * glm::mat4(1));
 
 		axe_pos.push_back(glm::vec3(0, 0, -0.4));
+		axe_pos.push_back(vec3(0, 0, -0.2));
+		axe_rots.push_back(mat4(1));
 		axe_rots.push_back(mat4(1));
 
 		mace_pos.push_back(glm::vec3(0.3, 0.05, -0.4));
+		mace_pos.push_back(glm::vec3(0.3, 0.05, -0.2));
+		mace_rots.push_back(mat4(1));
 		mace_rots.push_back(mat4(1));
 		
 		sword_pos.push_back(glm::vec3(-0.3, 0, -0.4));
+		sword_pos.push_back(glm::vec3(-0.3, 0, -0.2));
+		sword_rots.push_back(mat4(1));
 		sword_rots.push_back(mat4(1));
 
+		axe_head_radius = 0.13;
 		axe_sphere_trans = glm::translate(axe_handle) *  glm::scale(glm::mat4(1.0f), glm::vec3(0.04f)) * glm::mat4(1);
+		axe_collision_trans = (glm::translate(axe_head) * glm::scale(vec3(axe_head_radius)));
+
+		mace_head_radius = 0.08;
 		mace_sphere_trans = glm::translate(mace_handle) *  glm::scale(glm::mat4(1.0f), glm::vec3(0.03f)) * glm::mat4(1);
+		mace_collision_trans = (glm::translate(mace_head) * glm::scale(vec3(mace_head_radius)));
+
 		sword_sphere_trans = glm::translate(sword_handle) *  glm::scale(glm::mat4(1.0f), glm::vec3(0.03f)) * glm::mat4(1);
+
+		weapon_p2 = a_axe;
+
+		for (int i = 0; i < 2; i++) {
+			axe_collision.push_back(mat4(1));
+			mace_collision.push_back(mat4(1));
+			sword_collision.push_back(mat4(1));
+
+			mace_sphere.push_back(mat4(1));
+			axe_sphere.push_back(mat4(1));
+			sword_sphere.push_back(mat4(1));
+		}
+
 
 		
 
@@ -928,43 +973,76 @@ public:
 
 		glm::mat4 sphereToWorld;
 
-		if (weapon == a_axe) {
+		if (weapon_p1 == a_axe) {
 			axe_rots[0] =  rot * glm::rotate(-90 * pi / 180.0f, vec3(0,1,0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
 			axe_pos[0] = handPose - (mat3(axe_rots[0]) * axe_handle);
 		}
 
-		else if (weapon == a_mace) {
+		else if (weapon_p1 == a_mace) {
 			mace_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
 			mace_pos[0] = handPose - (mat3(mace_rots[0]) * mace_handle);
 		}
 
-		else if (weapon == a_sword) {
+		else if (weapon_p1 == a_sword) {
 			sword_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
 			sword_pos[0] = handPose - (mat3(sword_rots[0]) * sword_handle);
 		}
 
 		if (!prev_frame_idx && pressedRIdx) {
-			float dist = glm::distance(handPose, vec3(axe_sphere * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			float dist = glm::distance(handPose, vec3(axe_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
-				weapon = a_axe;
+				weapon_p1 = a_axe;
 			}
 
-			dist = glm::distance(handPose, vec3(mace_sphere * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			dist = glm::distance(handPose, vec3(mace_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
-				weapon = a_mace;
+				weapon_p1 = a_mace;
 			}
 
-			dist = glm::distance(handPose, vec3(sword_sphere * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			dist = glm::distance(handPose, vec3(sword_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
-				weapon = a_sword;
+				weapon_p1 = a_sword;
 			}
 		}
+
 		else if (!pressedRIdx) {
-			weapon = a_none;
+			weapon_p1 = a_none;
 		}
 
-		//mat4 trans = glm::translate(glm::mat4(1.0), axe_pos[0]) * axes[0] * mat4(1);
+		//Collision checks
+		if (weapon_p1 == a_axe && weapon_p2 == a_axe) {
+			float dist = glm::distance(vec3(axe_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(axe_collision[1] * vec4(0, 0, 0, 1.0f)));
+			if (dist < 2 * axe_head_radius)
+				printf("COLLIDE\n");
+		}
+
+		else if (weapon_p1 == a_mace && weapon_p2 == a_mace) {
+			float dist = glm::distance(vec3(mace_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(mace_collision[1] * vec4(0, 0, 0, 1.0f)));
+			if (dist < 2 * mace_head_radius)
+				printf("COLLIDE\n");
+		}
+
+		else if (weapon_p1 == a_mace && weapon_p2 == a_axe) {
+			float dist = glm::distance(vec3(mace_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(axe_collision[1] * vec4(0, 0, 0, 1.0f)));
+			if (dist < mace_head_radius + axe_head_radius)
+				printf("COLLIDE\n");
+		}
+
+		else if (weapon_p1 == a_axe && weapon_p2 == a_mace) {
+			float dist = glm::distance(vec3(axe_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(mace_collision[1] * vec4(0, 0, 0, 1.0f)));
+			if (dist < mace_head_radius + axe_head_radius)
+				printf("COLLIDE\n");
+		}
+
+
+
+		//Drawing the weapons
 		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[0]) * axe_rots[0] * glm::translate(-axe_handle) * axes[0];
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
+		axe->Draw(secondShader);
+
+		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[1]) * axe_rots[1] * glm::translate(-axe_handle) * axes[1];
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
 		axe->Draw(secondShader);
@@ -973,28 +1051,66 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
 		mace->Draw(secondShader);
 
+		sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[1]) * mace_rots[1] * glm::translate(-mace_handle) * maces[1];
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		mace->Draw(secondShader);
+
 		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[0]) * sword_rots[0] * glm::translate(-sword_handle) * swords[0];
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		sword->Draw(secondShader);
+
+		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[1]) * sword_rots[1] * glm::translate(-sword_handle) * swords[1];
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
 		sword->Draw(secondShader);
 		
 		//Hand
-		sphereToWorld = glm::translate(glm::mat4(1.0f), handPose) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1);
+		sphereToWorld = glm::translate(handPose) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1);
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
 		sphere->Draw(secondShader);
 
 		//Mace sphere
-		mace_sphere = glm::translate(glm::mat4(1.0f), mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_sphere)[0][0]);
+		mace_sphere[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_sphere[0])[0][0]);
+		sphere->Draw(secondShader);
+
+		mace_sphere[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_sphere[1])[0][0]);
+		sphere->Draw(secondShader);
+
+		//Mace collision
+		mace_collision[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_collision_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_collision[0])[0][0]);
+		sphere->Draw(secondShader);
+
+		mace_collision[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_collision_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_collision[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		//Sword sphere
-		sword_sphere = glm::translate(glm::mat4(1.0f), sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sword_sphere)[0][0]);
+		sword_sphere[0] = glm::translate(sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sword_sphere[0])[0][0]);
+		sphere->Draw(secondShader);
+
+		sword_sphere[1] = glm::translate(sword_pos[1]) * sword_rots[1] * sword_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sword_sphere[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		//Axe sphere
-		axe_sphere = glm::translate(glm::mat4(1.0f), axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_sphere)[0][0]);
+		axe_sphere[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_sphere[0])[0][0]);
+		sphere->Draw(secondShader);
+
+		axe_sphere[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_sphere_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_sphere[1])[0][0]);
+		sphere->Draw(secondShader);
+
+		//Axe collision
+		axe_collision[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_collision_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_collision[0])[0][0]);
+		sphere->Draw(secondShader);
+
+		axe_collision[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_collision_trans;
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_collision[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		prev_frame_idx = pressedRIdx;
