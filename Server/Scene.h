@@ -195,21 +195,27 @@ public:
 		case 0:
 			axe_pos[weapon_ix] = pos;
 			axe_rots[weapon_ix] = rot;
+			break;
 		case 1:
 			axe_pos[weapon_ix] = pos;
 			axe_rots[weapon_ix] = rot;
+			break;
 		case 2:
 			mace_pos[weapon_ix - 2] = pos;
 			mace_rots[weapon_ix - 2] = rot;
+			break;
 		case 3:
 			mace_pos[weapon_ix - 2] = pos;
 			mace_rots[weapon_ix - 2] = rot;
+			break;
 		case 4:
 			sword_pos[weapon_ix - 4] = pos;
 			sword_rots[weapon_ix - 4] = rot;
+			break;
 		case 5:
 			sword_pos[weapon_ix - 4] = pos;
 			sword_rots[weapon_ix - 4] = rot;
+			break;
 		default:
 			break;
 		}

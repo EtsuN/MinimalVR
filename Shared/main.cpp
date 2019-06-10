@@ -606,24 +606,31 @@ protected:
 
 		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
 
-		
-	
 		PlayerInfo op = run_client(*(me->getPlayerInfo()));
 		oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
 		oppo_rot = mat3(op.rhandInWorld);
 		oppo_handPose = op.rhandInWorld * vec4(0, 0, 0, 1);
+		oppo->heldWeapon = op.heldWeapon;
+
+		printf("ME: %d\n", me->heldWeapon);
+		printf("MYWEAPON: %d\n", weapon_p1);
+		printf("OPPO: %d\n", op.heldWeapon);
 
 
 		if (player_num == 1) {
 			switch (op.heldWeapon) {
 			case 1:
 				weapon_p2 = a_axe;
+				break;
 			case 3:
 				weapon_p2 = a_mace;
+				break;
 			case 5:
 				weapon_p2 = a_sword;
+				break;
 			case -1:
 				weapon_p2 = a_none;
+				break;
 			}
 		}
 
@@ -631,12 +638,16 @@ protected:
 			switch (op.heldWeapon) {
 			case 0:
 				weapon_p2 = a_axe;
+				break;
 			case 2:
 				weapon_p2 = a_mace;
+				break;
 			case 4:
 				weapon_p2 = a_sword;
+				break;
 			case -1:
 				weapon_p2 = a_none;
+				break;
 			}
 		}
 		
@@ -644,12 +655,16 @@ protected:
 			switch (weapon_p1) {
 			case a_axe:
 				me->heldWeapon = 0;
+				break;
 			case a_mace:
 				me->heldWeapon = 2;
+				break;
 			case a_sword:
 				me->heldWeapon = 4;
+				break;
 			case a_none:
 				me->heldWeapon = -1;
+				break;
 			}
 		}
 
@@ -657,12 +672,16 @@ protected:
 			switch (weapon_p1) {
 			case a_axe:
 				me->heldWeapon = 1;
+				break;
 			case a_mace:
 				me->heldWeapon = 3;
+				break;
 			case a_sword:
 				me->heldWeapon = 5;
+				break;
 			case a_none:
 				me->heldWeapon = -1;
+				break;
 			}
 		}
 
