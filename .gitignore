@@ -18,7 +18,8 @@
 [Rr]elease/
 [Rr]eleases/
 x64/
-x86/
+x86/*
+!Include/rpc/
 bld/
 [Bb]in/
 [Oo]bj/
