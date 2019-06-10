@@ -57,8 +57,10 @@ int main() {
 		return std::make_tuple(string("> ") + s, p);
 	});
 
+	
 	srv->bind("push", [](PlayerInfo & p, int player_no) {
 		new_game->update(p, player_no);
+		return std::make_tuple(new_game->players[player_no == 1 ? 1 : 0], new_game->render_weapons);
 	});
 
 	// Blocking call to start the server: non-blocking call is srv.async_run(threadsCount);
