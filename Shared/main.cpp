@@ -1075,48 +1075,48 @@ public:
 		glm::mat4 sphereToWorld;
 
 		if (weapon_p1 == a_axe) {
-			axe_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			axe_pos[0] = handPose - (mat3(axe_rots[0]) * axe_handle);
+			axe_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(axe_rots[player_num == 1 ? 0 : 1]) * axe_handle);
 		}
 
 		else if (weapon_p1 == a_mace) {
-			mace_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			mace_pos[0] = handPose - (mat3(mace_rots[0]) * mace_handle);
+			mace_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			mace_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(mace_rots[player_num == 1 ? 0 : 1]) * mace_handle);
 		}
 
 		else if (weapon_p1 == a_sword) {
-			sword_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			sword_pos[0] = handPose - (mat3(sword_rots[0]) * sword_handle);
+			sword_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			sword_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(sword_rots[player_num == 1 ? 0 : 1]) * sword_handle);
 		}
 
 		if (weapon_p2 == a_axe) {
-			axe_rots[1] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			axe_pos[1] = oppo_handPose - (mat3(axe_rots[1]) * axe_handle);
+			axe_rots[(player_num == 1 ? 1 : 0)] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[(player_num == 1 ? 1 : 0)] = oppo_handPose - (mat3(axe_rots[player_num == 1 ? 1 : 0]) * axe_handle);
 		}
 
 		else if (weapon_p2 == a_mace) {
-			mace_rots[1] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			mace_pos[1] = oppo_handPose - (mat3(mace_rots[1]) * mace_handle);
+			mace_rots[(player_num == 1 ? 1 : 0)] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			mace_pos[(player_num == 1 ? 1 : 0)] = oppo_handPose - (mat3(mace_rots[player_num == 1 ? 1 : 0]) * mace_handle);
 		}
 
 		else if (weapon_p2 == a_sword) {
-			sword_rots[1] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			sword_pos[1] = oppo_handPose - (mat3(sword_rots[1]) * sword_handle);
+			sword_rots[(player_num == 1 ? 1 : 0)] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			sword_pos[(player_num == 1 ? 1 : 0)] = oppo_handPose - (mat3(sword_rots[player_num == 1 ? 1 : 0]) * sword_handle);
 		}
 
 		if (!prev_frame_idx && pressedRIdx) {
-			float dist = glm::distance(handPose, vec3(axe_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			float dist = glm::distance(handPose, vec3(axe_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
 				weapon_p1 = a_axe;
 			}
 
-			dist = glm::distance(handPose, vec3(mace_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			dist = glm::distance(handPose, vec3(mace_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			printf("%f\n", dist);
 			if (dist < 0.04) {
 				weapon_p1 = a_mace;
 			}
 
-			dist = glm::distance(handPose, vec3(sword_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			dist = glm::distance(handPose, vec3(sword_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
 				weapon_p1 = a_sword;
 			}
