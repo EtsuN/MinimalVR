@@ -596,8 +596,24 @@ protected:
 
 		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
 
-		//PlayerInfo op = run_client(me->getPlayerInfo());
-		//oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
+		
+		std::cout << "HELLO" << std::endl;
+		//std::cout << ovr::toGlm(trackState.HeadPose.ThePose)[0][0] << std::endl;
+		//std::cout << me->getHeadPose()[0][0] << std::endl;
+		//std::cout << me->toWorld[0][0] << std::endl;
+		//std::cout << me->headToPlayer[0][0] << std::endl;
+		//std::cout << me->info->headInWorld[0][0] << std::endl;
+
+		PlayerInfo op = run_client(*(me->getPlayerInfo()));
+		oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
+		//std::cout << oppo->getHeadPose()[0][0] << std::endl;
+		//std::cout << oppo->toWorld[0][0] << std::endl;
+		//std::cout << oppo->headToPlayer[0][0] << std::endl;
+		//std::cout << oppo->info->headInWorld[0][0] << std::endl;
+		for (int i = 0; i < 6; i++) {
+			weapon_state[i] = weapons[i];
+		}
+
 
 		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
 			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)

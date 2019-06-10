@@ -50,6 +50,9 @@ public:
 
 	glm::mat4 toWorld;
 
+
+	PlayerInfo* info;
+
 	//constant
 	float handScale = 0.1;
 	float headScale = 0.5;
@@ -59,10 +62,14 @@ public:
 		isMe = isMe;
 		handSphere = sphere;
 		head = nullptr; //TODO
-
+		heldWeapon = -1;
 		headToPlayer = glm::mat4(1);
 		rhandToPlayer = glm::translate(glm::mat4(1), glm::vec3(1, -1, 0));
 		lhandToPlayer = glm::translate(glm::mat4(1), glm::vec3(-1, -1, 0));
+
+
+		info = new PlayerInfo();
+		getPlayerInfo(); // update info
 	};
 
 	void updatePlayer(glm::mat4 h, glm::mat4 r, glm::mat4 l) {
@@ -106,12 +113,11 @@ public:
 		return toWorld * rhandToPlayer * glm::scale(glm::mat4(1), glm::vec3(handScale));
 	};
 
-	PlayerInfo getPlayerInfo() {
-		PlayerInfo info;
-		info.headInWorld = getHeadPose();
-		info.rhandInWorld = getRHandPose();
-		info.lhandInWorld = getLHandPose();
-		info.heldWeapon = heldWeapon;
+	PlayerInfo* getPlayerInfo() {
+		info->headInWorld = getHeadPose();
+		info->rhandInWorld = getRHandPose();
+		info->lhandInWorld = getLHandPose();
+		info->heldWeapon = heldWeapon;
 		return info;
 	};
 
