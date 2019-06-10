@@ -54,8 +54,8 @@ public:
 	PlayerInfo* info;
 
 	//constant
-	float handScale = 0.1;
-	float headScale = 0.5;
+	float handScale = 0.05;
+	float headScale = 0.2;
 
 	Player(glm::mat4 M, bool isMe, Model* sphere) {
 		toWorld = M;

@@ -244,8 +244,8 @@ public:
 
 		// initialize Players
 		sphere = new Model("../Shared/sphere2.obj");
-		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 2));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
-		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 2));
+		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
+		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5));
 		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player( (player_num == 1) ? player1 : player2,
@@ -596,20 +596,10 @@ protected:
 
 		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
 
-		
-		std::cout << "HELLO" << std::endl;
-		//std::cout << ovr::toGlm(trackState.HeadPose.ThePose)[0][0] << std::endl;
-		//std::cout << me->getHeadPose()[0][0] << std::endl;
-		//std::cout << me->toWorld[0][0] << std::endl;
-		//std::cout << me->headToPlayer[0][0] << std::endl;
-		//std::cout << me->info->headInWorld[0][0] << std::endl;
-
+	
 		PlayerInfo op = run_client(*(me->getPlayerInfo()));
 		oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
-		//std::cout << oppo->getHeadPose()[0][0] << std::endl;
-		//std::cout << oppo->toWorld[0][0] << std::endl;
-		//std::cout << oppo->headToPlayer[0][0] << std::endl;
-		//std::cout << oppo->info->headInWorld[0][0] << std::endl;
+		
 		for (int i = 0; i < 6; i++) {
 			weapon_state[i] = weapons[i];
 		}

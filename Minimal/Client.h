@@ -41,9 +41,7 @@ PlayerInfo run_client(PlayerInfo myInfo)
 	string input = "hi";
 
 	PlayerInfo op;
-	std::cout << myInfo.headInWorld[0][0] << std::endl;
 	std::tie(op, weapons) = c->call("push", myInfo, player_num).get().as<std::tuple<PlayerInfo, vector<bool>>/*cast back the respond message to string and Player*/>();
 
-	std::cout << op.headInWorld[0][0] << std::endl;
 	return op;
 }
