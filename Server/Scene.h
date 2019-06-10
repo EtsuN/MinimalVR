@@ -128,6 +128,20 @@ public:
 		}
 	}
 
+	void update(PlayerInfo & p, int player) {
+		if (player == 1) {
+			player_1_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
+			player_1_weapon = p.heldWeapon;
+			update_weapon(player_1_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+		}
+
+		if (player == 2) {
+			player_2_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
+			player_2_weapon = p.heldWeapon;
+			update_weapon(player_2_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+		}
+	}
+
 	void update_weapon(int weapon_ix, vec3 pos, mat4 rot) {
 		switch (weapon_ix)
 		{

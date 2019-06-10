@@ -1,13 +1,15 @@
 #include "../Shared/ServerClientConnection.h"
 #include "pch.h"
 #include "rpc/server.h"
-
+#include "../Shared/Player.h"
 #include <glm/gtx/string_cast.hpp>
+#include "Scene.h"
 
 // Shared struct
 
 
 using std::string;
+Scene * new_game;
 /*
 Always test in release mode
 Set the IP address
@@ -30,9 +32,13 @@ rpc::server* srv;
 
 int connectedPlayers = 0;
 
-void init_server() {
+int main() {
 	srv = new rpc::server(PORT);
 	std::cout << "Listening to port: " << PORT << std::endl;
+
+	new_game = new Scene();
+
+
 	
 	srv->bind("handshake", [](string const& s) {
 		std::cout << "Connected to client: " << s << std::endl;
@@ -51,9 +57,12 @@ void init_server() {
 		return std::make_tuple(string("> ") + s, p);
 	});
 
+	srv->bind("push", [](PlayerInfo & p, int player_no) {
+		new_game->update(p, player_no);
+	});
+
 	// Blocking call to start the server: non-blocking call is srv.async_run(threadsCount);
 
 	std::cout << "Running the server now " << std::endl;
-	srv->async_run(3);
-
+	srv->run();
 }

@@ -147,10 +147,10 @@
     <ClInclude Include="..\Shared\Skybox.h" />
     <ClInclude Include="..\Shared\TexturedCube.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\Cube.cpp" />
-    <ClCompile Include="..\Shared\main.cpp" />
     <ClCompile Include="..\Shared\shader.cpp" />
     <ClCompile Include="..\Shared\Skybox.cpp" />
     <ClCompile Include="..\Shared\TexturedCube.cpp" />
