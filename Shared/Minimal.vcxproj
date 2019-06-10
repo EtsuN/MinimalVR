@@ -143,6 +143,7 @@
     <ClCompile Include="..\Minimal\pch.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="TexturedCube.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ServerClientConnection.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="Skybox.h" />
