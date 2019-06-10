@@ -10,6 +10,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <tuple>
+#include "../Shared/Player.h"
 
 
 using namespace std;
@@ -70,6 +71,9 @@ private:
 
 	float pi = 3.141592653589793;
 public:
+	PlayerInfo players[2];
+	vector<bool> render_weapons;
+
 	Scene() {
 		axe_handle = vec3(0, -0.1, -0.01);
 		mace_handle = vec3(0.005, -0.2, 0);
@@ -117,6 +121,9 @@ public:
 
 		head_radius = 1.0;
 
+		for (int i = 0; i < 6; i++)
+			render_weapons.push_back(true);
+
 		for (int i = 0; i < 2; i++) {
 			axe_collision.push_back(mat4(1));
 			mace_collision.push_back(mat4(1));
@@ -128,17 +135,35 @@ public:
 		}
 	}
 
+	//TODO
+	void check_interaction(int weapon1, int weapon2) {
+		return;
+	}
+
 	void update(PlayerInfo & p, int player) {
 		if (player == 1) {
 			player_1_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
 			player_1_weapon = p.heldWeapon;
 			update_weapon(player_1_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+			players[0] = p;
 		}
 
 		if (player == 2) {
 			player_2_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
 			player_2_weapon = p.heldWeapon;
 			update_weapon(player_2_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+			players[1] = p;
+		}
+		bool weapon, player1_dead, player2_dead;
+		std::tie(weapon, player1_dead, player2_dead) = check_collision();
+
+		/*if (player1_dead)
+			players[0].dead = 1;
+		else if (player2_dead)
+			players[1].dead = 1;*/
+
+		if (weapon) {
+			check_interaction(players[0].heldWeapon, players[1].heldWeapon);
 		}
 	}
 
@@ -221,6 +246,7 @@ public:
 	float shortest_distance(vec3 & pos, mat4 & rot, vector<mat4> & sword, vec4 point) {
 		mat4 collision_point = translate(pos) * rot;
 		float dist, cur_dist;
+		dist = 1000000.0f;
 		for (int i = 0; i < 9; i++) {
 			cur_dist = distance(collision_point * sword[i] * vec4(0, 0, 0, 1), point);
 			if (cur_dist < dist)

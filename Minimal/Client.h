@@ -11,8 +11,6 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-				   // Shared struct
-
 
 using std::string;
 /*
