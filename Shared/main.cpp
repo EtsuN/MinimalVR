@@ -1138,85 +1138,114 @@ public:
 		//Drawing the weapons
 		glUseProgram(secondShader);
 
-			//axe
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 0, 0))[0]); 
-		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[0]) * axe_rots[0] * glm::translate(-axe_handle) * axes[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		axe->Draw(secondShader);
 
-		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[1]) * axe_rots[1] * glm::translate(-axe_handle) * axes[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		axe->Draw(secondShader);
+		//axe
+		if (weapon_state[0] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 0, 0))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[0]) * axe_rots[0] * glm::translate(-axe_handle) * axes[0];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			axe->Draw(secondShader);
 
-			//mace
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 1, 0))[0]);
-		sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[0]) * mace_rots[0] * glm::translate(-mace_handle) * maces[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		mace->Draw(secondShader);
 
-		sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[1]) * mace_rots[1] * glm::translate(-mace_handle) * maces[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		mace->Draw(secondShader);
+			//Axe sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			axe_sphere[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[0])[0][0]);
+			sphere->Draw(secondShader);
 
-			//sword
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 0, 1))[0]);
-		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[0]) * sword_rots[0] * glm::translate(-sword_handle) * swords[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		sword->Draw(secondShader);
+			//Axe collision
+			axe_collision[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_collision_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[0])[0][0]);
+			sphere->Draw(secondShader);
 
-		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[1]) * sword_rots[1] * glm::translate(-sword_handle) * swords[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		sword->Draw(secondShader);
+		}
+		if (weapon_state[1] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 0, 0))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[1]) * axe_rots[1] * glm::translate(-axe_handle) * axes[1];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			axe->Draw(secondShader);
 
-		//Mace sphere
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
-		mace_sphere[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[0])[0][0]);
-		sphere->Draw(secondShader);
+			//Axe sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			axe_sphere[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[1])[0][0]);
+			sphere->Draw(secondShader);
 
-		mace_sphere[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[1])[0][0]);
-		sphere->Draw(secondShader);
+			//Axe collision
+			axe_collision[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_collision_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[1])[0][0]);
+			sphere->Draw(secondShader);
+		}
 
-		//Mace collision
-		mace_collision[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[0])[0][0]);
-		sphere->Draw(secondShader);
+		//mace
+		if (weapon_state[2] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 1, 0))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[0]) * mace_rots[0] * glm::translate(-mace_handle) * maces[0];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			mace->Draw(secondShader);
 
-		mace_collision[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[1])[0][0]);
-		sphere->Draw(secondShader);
+			//Mace sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			mace_sphere[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[0])[0][0]);
+			sphere->Draw(secondShader);
 
-		//Sword sphere
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
-		sword_sphere[0] = glm::translate(sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[0])[0][0]);
-		sphere->Draw(secondShader);
+			//Mace collision
+			mace_collision[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_collision_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[0])[0][0]);
+			sphere->Draw(secondShader);
+		}
+		if (weapon_state[3] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 1, 0))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[1]) * mace_rots[1] * glm::translate(-mace_handle) * maces[1];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			mace->Draw(secondShader);
 
-		sword_sphere[1] = glm::translate(sword_pos[1]) * sword_rots[1] * sword_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[1])[0][0]);
-		sphere->Draw(secondShader);
+			//Mace sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			mace_sphere[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[1])[0][0]);
+			sphere->Draw(secondShader);
 
-		//Sword collision
+			//Mace collision
+			mace_collision[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_collision_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[1])[0][0]);
+			sphere->Draw(secondShader);
+		}
 
-		//Axe sphere
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
-		axe_sphere[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[0])[0][0]);
-		sphere->Draw(secondShader);
+		//sword
+		if (weapon_state[4] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 0, 1))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[0]) * sword_rots[0] * glm::translate(-sword_handle) * swords[0];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			sword->Draw(secondShader);
 
-		axe_sphere[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[1])[0][0]);
-		sphere->Draw(secondShader);
+			//Sword sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			sword_sphere[0] = glm::translate(sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[0])[0][0]);
+			sphere->Draw(secondShader);
 
-		//Axe collision
-		axe_collision[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[0])[0][0]);
-		sphere->Draw(secondShader);
 
-		axe_collision[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[1])[0][0]);
-		sphere->Draw(secondShader);
+			//Sword collision
+
+		}
+
+		if (weapon_state[5] == true) {
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 0, 1))[0]);
+			sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[1]) * sword_rots[1] * glm::translate(-sword_handle) * swords[1];
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
+			sword->Draw(secondShader);
+
+			//Sword sphere
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			sword_sphere[1] = glm::translate(sword_pos[1]) * sword_rots[1] * sword_sphere_trans;
+			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[1])[0][0]);
+			sphere->Draw(secondShader);
+
+
+			//Sword collision
+		}
 
 		prev_frame_idx = pressedRIdx;
 

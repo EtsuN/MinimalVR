@@ -135,9 +135,30 @@ public:
 		}
 	}
 
-	//TODO
+	//check the interaction between the held weapon, and disable the rendering for the broken weapon
 	void check_interaction(int weapon1, int weapon2) {
-		return;
+		int type1 = weapon1 / 2;
+		int type2 = weapon2 / 2;
+		if (type1 == type2) {
+			render_weapons[weapon1] = false;
+			render_weapons[weapon2] = false;
+		}
+		else if (type1 > type2) {
+			if (type1 - type2 == 2) { // type1 = sword; type2 = axe
+				render_weapons[weapon2] = false;
+			}
+			else { //1=sword 2=mace; 1=mace 2=axe
+				render_weapons[weapon1] = false;
+			}
+		}
+		else {
+			if (type2 - type1 == 2) { // type2 = sword; type1 = axe
+				render_weapons[weapon1] = false;
+			}
+			else { //2=sword 1=mace; 2=mace 1=axe
+				render_weapons[weapon2] = false;
+			}
+		}
 	}
 
 	void update(PlayerInfo & p, int player) {
