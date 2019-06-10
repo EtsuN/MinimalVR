@@ -136,6 +136,7 @@ public:
 	}
 
 	//check the interaction between the held weapon, and disable the rendering for the broken weapon
+	//TODO
 	void check_interaction(int weapon1, int weapon2) {
 		if (weapon1 == -1 || weapon2 == -1) return;
 		int type1 = weapon1 / 2;
@@ -184,7 +185,7 @@ public:
 		else if (player2_dead)
 			players[1].dead = 1;
 
-		if (weapon) {
+		if (weapon) { //TODO
 			check_interaction(players[0].heldWeapon, players[1].heldWeapon);
 		}
 	}
