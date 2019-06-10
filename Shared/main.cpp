@@ -613,6 +613,7 @@ protected:
 		oppo_rot = mat3(op.rhandInWorld);
 		oppo_handPose = op.rhandInWorld * vec4(0, 0, 0, 1);
 
+
 		if (player_num == 1) {
 			switch (op.heldWeapon) {
 			case 1:
@@ -621,6 +622,8 @@ protected:
 				weapon_p2 = a_mace;
 			case 5:
 				weapon_p2 = a_sword;
+			case -1:
+				weapon_p2 = a_none;
 			}
 		}
 
@@ -632,6 +635,8 @@ protected:
 				weapon_p2 = a_mace;
 			case 4:
 				weapon_p2 = a_sword;
+			case -1:
+				weapon_p2 = a_none;
 			}
 		}
 		
@@ -643,6 +648,8 @@ protected:
 				me->heldWeapon = 2;
 			case a_sword:
 				me->heldWeapon = 4;
+			case a_none:
+				me->heldWeapon = -1;
 			}
 		}
 
@@ -654,8 +661,12 @@ protected:
 				me->heldWeapon = 3;
 			case a_sword:
 				me->heldWeapon = 5;
+			case a_none:
+				me->heldWeapon = -1;
 			}
 		}
+
+
 
 		for (int i = 0; i < 6; i++) {
 			weapon_state[i] = weapons[i];
@@ -1064,13 +1075,13 @@ public:
 		glm::mat4 sphereToWorld;
 
 		if (weapon_p1 == a_axe) {
-			axe_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			axe_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(axe_rots[0]) * axe_handle);
+			axe_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[0] = handPose - (mat3(axe_rots[0]) * axe_handle);
 		}
 
 		else if (weapon_p1 == a_mace) {
-			mace_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			mace_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(mace_rots[0]) * mace_handle);
+			mace_rots[0] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			mace_pos[0] = handPose - (mat3(mace_rots[0]) * mace_handle);
 		}
 
 		else if (weapon_p1 == a_sword) {
@@ -1079,8 +1090,8 @@ public:
 		}
 
 		if (weapon_p2 == a_axe) {
-			axe_rots[(player_num == 1 ? 1 : 0)] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
-			axe_pos[(player_num == 1 ? 1 : 0)] = oppo_handPose - (mat3(axe_rots[0]) * axe_handle);
+			axe_rots[1] = oppo_rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[1] = oppo_handPose - (mat3(axe_rots[0]) * axe_handle);
 		}
 
 		else if (weapon_p2 == a_mace) {

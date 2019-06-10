@@ -137,6 +137,7 @@ public:
 
 	//check the interaction between the held weapon, and disable the rendering for the broken weapon
 	void check_interaction(int weapon1, int weapon2) {
+		if (weapon1 == -1 || weapon2 == -1) return;
 		int type1 = weapon1 / 2;
 		int type2 = weapon2 / 2;
 		if (type1 == type2) {
