@@ -1,9 +1,10 @@
+#pragma once
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
 #include "Cube.h"
 #include "Model.h"
-
 
 #include "rpc/client.h"
 struct PlayerInfo {
@@ -27,7 +28,7 @@ struct PlayerInfo {
 		lhandInWorld[1][0], lhandInWorld[1][1], lhandInWorld[1][2], lhandInWorld[1][3],
 		lhandInWorld[2][0], lhandInWorld[2][1], lhandInWorld[2][2], lhandInWorld[2][3],
 		lhandInWorld[3][0], lhandInWorld[3][1], lhandInWorld[3][2], lhandInWorld[3][3]
-		);
+	)
 };
 
 class Player

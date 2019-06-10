@@ -42,7 +42,7 @@ limitations under the License.
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "Skybox.h"
-#include "ServerClientConnection.h"
+#include "../Minimal/Client.h"
 
 #include <vector>
 #include "shader.h"
@@ -508,6 +508,8 @@ public:
 	}
 };
 
+bool weapon_state[6];
+
 vec3 handPose;
 vec3 eyePose;
 mat4 rot;
@@ -577,8 +579,6 @@ public:
 
 protected:
 	void update() final override {
-		run_client();
-		run_server();
 
 
 		ovrInputState inputState;
@@ -592,12 +592,12 @@ protected:
 		handPosition[1] = handPoses[1].Position;
 
 		rot = glm::toMat4(ovr::toGlm(handPoses[1].Orientation));
-
 		handPose = ovr::toGlm(handPosition[1]);
-
 
 		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
 
+		//PlayerInfo op = run_client(me->getPlayerInfo());
+		//oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
 
 		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
 			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)
@@ -976,8 +976,9 @@ public:
 			sword_sphere.push_back(mat4(1));
 		}
 
-
-
+		for (int i = 0; i < 6; i++) {
+			weapon_state[i] = true;
+		}
 
 
 		// 10m wide sky box: size doesn't matter though

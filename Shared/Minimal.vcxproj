@@ -152,6 +152,7 @@
     <ClCompile Include="TexturedCube.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Minimal\Client.h" />
     <ClInclude Include="..\Minimal\pch.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Mesh.h" />
