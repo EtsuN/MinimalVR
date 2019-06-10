@@ -4,6 +4,32 @@
 #include "Cube.h"
 #include "Model.h"
 
+
+#include <rpc/client.h>
+struct PlayerInfo {
+	int heldWeapon;
+	glm::mat4 headInWorld;
+	glm::mat4 rhandInWorld;
+	glm::mat4 lhandInWorld;
+
+	MSGPACK_DEFINE_MAP(heldWeapon,
+		headInWorld[0][0], headInWorld[0][1], headInWorld[0][2], headInWorld[0][3],
+		headInWorld[1][0], headInWorld[1][1], headInWorld[1][2], headInWorld[1][3],
+		headInWorld[2][0], headInWorld[2][1], headInWorld[2][2], headInWorld[2][3],
+		headInWorld[3][0], headInWorld[3][1], headInWorld[3][2], headInWorld[3][3],
+
+		rhandInWorld[0][0], rhandInWorld[0][1], rhandInWorld[0][2], rhandInWorld[0][3],
+		rhandInWorld[1][0], rhandInWorld[1][1], rhandInWorld[1][2], rhandInWorld[1][3],
+		rhandInWorld[2][0], rhandInWorld[2][1], rhandInWorld[2][2], rhandInWorld[2][3],
+		rhandInWorld[3][0], rhandInWorld[3][1], rhandInWorld[3][2], rhandInWorld[3][3],
+
+		lhandInWorld[0][0], lhandInWorld[0][1], lhandInWorld[0][2], lhandInWorld[0][3],
+		lhandInWorld[1][0], lhandInWorld[1][1], lhandInWorld[1][2], lhandInWorld[1][3],
+		lhandInWorld[2][0], lhandInWorld[2][1], lhandInWorld[2][2], lhandInWorld[2][3],
+		lhandInWorld[3][0], lhandInWorld[3][1], lhandInWorld[3][2], lhandInWorld[3][3]
+		);
+};
+
 class Player
 {
 private:
@@ -24,9 +50,6 @@ public:
 	//constant
 	float handScale = 0.1;
 	float headScale = 0.5;
-
-
-
 
 	Player(glm::mat4 M, bool isMe, Model* sphere) {
 		toWorld = M;
@@ -78,6 +101,15 @@ public:
 	};
 	glm::mat4 getRHandPose() {
 		return toWorld * rhandToPlayer * glm::scale(glm::mat4(1), glm::vec3(handScale));
+	};
+
+	PlayerInfo getPlayerInfo() {
+		PlayerInfo info;
+		info.headInWorld = getHeadPose();
+		info.rhandInWorld = getRHandPose();
+		info.lhandInWorld = getLHandPose();
+		info.heldWeapon = heldWeapon;
+		return info;
 	};
 
 };

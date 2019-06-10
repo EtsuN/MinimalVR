@@ -244,8 +244,8 @@ public:
 
 		// initialize Players
 		sphere = new Model("../Shared/sphere2.obj");
-		glm::mat4 player1 = translate(mat4(1), vec3(0, 0, -2));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
-		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, -2));
+		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 2));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
+		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 2));
 		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player( (player_num == 1) ? player1 : player2,
@@ -1071,7 +1071,7 @@ public:
 		//set up uniforms
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view)[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
-		glUniform3fv(glGetUniformLocation(secondShader, "lightPos"), 1, &(vec3(0,0,20))[0]);
+		glUniform3fv(glGetUniformLocation(secondShader, "lightPos"), 1, &(vec3(0,20,0))[0]);
 		glUniform3fv(glGetUniformLocation(secondShader, "viewPos"), 1, &(eyePose)[0]);
 		glUniform3fv(glGetUniformLocation(secondShader, "lightColor"), 1, &(vec3(1, 1, 1))[0]);
 
@@ -1081,6 +1081,7 @@ public:
 		me->draw(secondShader, projection, view);
 		oppo->draw(secondShader, projection, view);
 
+	
 
 		//Drawing the weapons
 		glUseProgram(secondShader);
