@@ -66,6 +66,13 @@ using glm::vec3;
 using glm::vec4;
 using glm::quat;
 
+enum attach {
+	a_none, a_mace, a_axe, a_sword
+};
+
+attach weapon_p1;
+attach weapon_p2;
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // GLEW gives cross platform access to OpenGL 3.x+ functionality.  
@@ -887,12 +894,7 @@ protected:
 //
 
 // a class for building and rendering cubes
-enum attach {
-	a_none, a_mace, a_axe, a_sword
-};
 
-attach weapon_p1;
-attach weapon_p2;
 
 class Scene
 {
