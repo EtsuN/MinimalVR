@@ -44,6 +44,17 @@ limitations under the License.
 #include "Skybox.h"
 #include "ServerClientConnection.h"
 
+#include <vector>
+#include "shader.h"
+#include "Cube.h"
+#include "Model.h"
+#include "Player.h"
+
+Player* me;
+Player* oppo;
+
+Model* sphere;
+
 // Import the most commonly used types into the default namespace
 using glm::ivec3;
 using glm::ivec2;
@@ -225,6 +236,23 @@ public:
 		postCreate();
 
 		initGl();
+
+		//connect to client
+		// connect to server
+		//init_server();
+		int player_num = init_client();
+
+		// initialize Players
+		sphere = new Model("../Shared/sphere2.obj");
+		glm::mat4 player1 = translate(mat4(1), vec3(0, 0, -2));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
+		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, -2));
+		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
+		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
+		me = new Player( (player_num == 1) ? player1 : player2,
+			true, sphere);
+		oppo = new Player((player_num == 1) ? player2 : player1 ,
+			false, sphere);
+
 
 		while (!glfwWindowShouldClose(window))
 		{
@@ -568,6 +596,8 @@ protected:
 		handPose = ovr::toGlm(handPosition[1]);
 
 
+		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
+
 
 		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
 			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)
@@ -800,11 +830,6 @@ protected:
 // application would perform whatever rendering you want
 //
 
-#include <vector>
-#include "shader.h"
-#include "Cube.h"
-#include "Model.h"
-
 // a class for building and rendering cubes
 
 class Scene
@@ -864,7 +889,6 @@ class Scene
 	Model * sword;
 	Model * axe;
 	Model * mace;
-	Model * sphere;
 
 	enum attach {
 		a_none, a_mace, a_axe, a_sword
@@ -895,7 +919,6 @@ public:
 		cube = std::make_unique<TexturedCube>("../Shared/cube");
 
 		//sphere
-		sphere = new Model("../Shared/sphere2.obj");
 		mace = new Model("../Shared/mace/WARROIRS_MACE.obj");
 		axe = new Model("../Shared/fbx/axe.obj");
 		sword = new Model("../Shared/sword/untitled.obj");
@@ -976,8 +999,6 @@ public:
 		glUseProgram(shaderID);
 		skybox->draw(shaderID, projection, view);
 
-		//glDepthMask(GL_TRUE);
-		glUseProgram(secondShader);
 
 		glm::mat4 sphereToWorld;
 
@@ -1043,14 +1064,26 @@ public:
 		}
 
 
+		//glDepthMask(GL_TRUE);
+		glUseProgram(secondShader);
 
-		//Drawing the weapons
-			//set up uniforms
+
+		//set up uniforms
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view)[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
 		glUniform3fv(glGetUniformLocation(secondShader, "lightPos"), 1, &(vec3(0,0,20))[0]);
 		glUniform3fv(glGetUniformLocation(secondShader, "viewPos"), 1, &(eyePose)[0]);
 		glUniform3fv(glGetUniformLocation(secondShader, "lightColor"), 1, &(vec3(1, 1, 1))[0]);
+
+
+
+		//Draw Players
+		me->draw(secondShader, projection, view);
+		oppo->draw(secondShader, projection, view);
+
+
+		//Drawing the weapons
+		glUseProgram(secondShader);
 
 			//axe
 		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 0, 0))[0]); 
@@ -1081,12 +1114,6 @@ public:
 		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[1]) * sword_rots[1] * glm::translate(-sword_handle) * swords[1];
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		sword->Draw(secondShader);
-
-		//Hand
-		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
-		sphereToWorld = glm::translate(handPose) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1);
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
-		sphere->Draw(secondShader);
 
 		//Mace sphere
 		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
@@ -1170,7 +1197,7 @@ protected:
 
 	void renderScene(const glm::mat4& projection, const glm::mat4& headPose) override
 	{
-		scene->render(projection, glm::inverse(headPose));
+		scene->render(projection, glm::inverse(me->toWorld * headPose));
 	}
 };
 
@@ -1179,8 +1206,6 @@ int main(int argc, char** argv)
 {
 	int result = -1;
 
-	init_server();
-	init_client();
 
 	if (!OVR_SUCCESS(ovr_Initialize(nullptr)))
 	{

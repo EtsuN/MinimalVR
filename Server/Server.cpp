@@ -13,7 +13,8 @@ Always test in release mode
 Set the IP address
 */
 
-void init_client() {
+int init_client() {
+	return 0;
 }
 
 void run_client()
@@ -27,12 +28,16 @@ void run_server() {	/* empty */ }
 #define PORT 8080
 rpc::server* srv;
 
+int connectedPlayers = 0;
+
 void init_server() {
 	srv = new rpc::server(PORT);
 	std::cout << "Listening to port: " << PORT << std::endl;
+	
 	srv->bind("handshake", [](string const& s) {
 		std::cout << "Connected to client: " << s << std::endl;
-		return "Etsu";
+		connectedPlayers++;
+		return connectedPlayers;
 	});
 
 	// Define a rpc function: auto echo(string const& s, Player& p){} (return type is deduced)
