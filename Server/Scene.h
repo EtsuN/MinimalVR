@@ -157,10 +157,10 @@ public:
 		bool weapon, player1_dead, player2_dead;
 		std::tie(weapon, player1_dead, player2_dead) = check_collision();
 
-		/*if (player1_dead)
+		if (player1_dead)
 			players[0].dead = 1;
 		else if (player2_dead)
-			players[1].dead = 1;*/
+			players[1].dead = 1;
 
 		if (weapon) {
 			check_interaction(players[0].heldWeapon, players[1].heldWeapon);
@@ -274,7 +274,7 @@ public:
 					mat4 weapon_2_collision = glm::translate(player_2_wpos) * player_2_wrot * get_weapon_collision(player_2_weapon);
 					float dist = distance(weapon_2_collision * vec4(0, 0, 0, 1), vec4(player_1_head, 1));
 					if (dist < get_weapon_radius(player_2_weapon) + head_radius) {
-						printf("PLAYER 1 DEAD");
+						//printf("PLAYER 1 DEAD");
 						h1 = true;
 					}
 				}
@@ -293,7 +293,7 @@ public:
 					mat4 weapon_1_collision = glm::translate(player_1_wpos) * player_1_wrot * get_weapon_collision(player_1_weapon);
 					float dist = distance(weapon_1_collision * vec4(0, 0, 0, 1), vec4(player_2_head, 1));
 					if (dist < get_weapon_radius(player_1_weapon) + head_radius) {
-						printf("PLAYER 2 DEAD");
+						//printf("PLAYER 2 DEAD");
 						h2 = true;
 					}
 				}
@@ -315,17 +315,17 @@ public:
 
 			float dist = distance(weapon_1_collision * vec4(0, 0, 0, 1), weapon_2_collision * vec4(0, 0, 0, 1));
 			if (dist < get_weapon_radius(player_1_weapon) + get_weapon_radius(player_2_weapon)) {
-				printf("WEAPONS COLLIDE");
+				//printf("WEAPONS COLLIDE");
 				w = true;
 			}
 			dist = distance(weapon_1_collision * vec4(0, 0, 0, 1), vec4(player_2_head, 1));
 			if (dist < get_weapon_radius(player_1_weapon) + head_radius) {
-				printf("PLAYER 2 DEAD");
+				//printf("PLAYER 2 DEAD");
 				h2 = true;
 			}
 			dist = distance(weapon_2_collision * vec4(0, 0, 0, 1), vec4(player_1_head, 1));
 			if (dist < get_weapon_radius(player_2_weapon) + head_radius) {
-				printf("PLAYER 1 DEAD");
+				//printf("PLAYER 1 DEAD");
 				h1 = true;
 			}
 		}

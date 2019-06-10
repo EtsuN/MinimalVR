@@ -55,7 +55,7 @@ int main() {
 
 	srv->bind("push", [](PlayerInfo & p, int player_no) {
 		new_game->update(p, player_no);
-		printf("HELLO: %d\n", player_no);
+		//printf("HELLO: %d\n", player_no);
 		return std::make_tuple(new_game->players[player_no == 1 ? 1 : 0], new_game->render_weapons);
 	});
 

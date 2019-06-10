@@ -244,8 +244,8 @@ public:
 
 		// initialize Players
 		sphere = new Model("../Shared/sphere2.obj");
-		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
-		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5));
+		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
+		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));
 		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player( (player_num == 1) ? player1 : player2,
@@ -591,8 +591,8 @@ protected:
 		handPosition[0] = handPoses[0].Position;
 		handPosition[1] = handPoses[1].Position;
 
-		rot = glm::toMat4(ovr::toGlm(handPoses[1].Orientation));
-		handPose = ovr::toGlm(handPosition[1]);
+		rot = mat4(mat3(me->toWorld)) * glm::toMat4(ovr::toGlm(handPoses[1].Orientation));
+		handPose =  me->getRHandPose() * vec4(0,0,0,1);
 
 		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
 
@@ -1031,6 +1031,7 @@ public:
 			}
 
 			dist = glm::distance(handPose, vec3(mace_sphere[0] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+			printf("%f\n", dist);
 			if (dist < 0.04) {
 				weapon_p1 = a_mace;
 			}
@@ -1043,31 +1044,6 @@ public:
 
 		else if (!pressedRIdx) {
 			weapon_p1 = a_none;
-		}
-
-		//Collision checks
-		if (weapon_p1 == a_axe && weapon_p2 == a_axe) {
-			float dist = glm::distance(vec3(axe_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(axe_collision[1] * vec4(0, 0, 0, 1.0f)));
-			if (dist < 2 * axe_head_radius)
-				printf("COLLIDE\n");
-		}
-
-		else if (weapon_p1 == a_mace && weapon_p2 == a_mace) {
-			float dist = glm::distance(vec3(mace_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(mace_collision[1] * vec4(0, 0, 0, 1.0f)));
-			if (dist < 2 * mace_head_radius)
-				printf("COLLIDE\n");
-		}
-
-		else if (weapon_p1 == a_mace && weapon_p2 == a_axe) {
-			float dist = glm::distance(vec3(mace_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(axe_collision[1] * vec4(0, 0, 0, 1.0f)));
-			if (dist < mace_head_radius + axe_head_radius)
-				printf("COLLIDE\n");
-		}
-
-		else if (weapon_p1 == a_axe && weapon_p2 == a_mace) {
-			float dist = glm::distance(vec3(axe_collision[0] * vec4(0, 0, 0, 1.0f)), vec3(mace_collision[1] * vec4(0, 0, 0, 1.0f)));
-			if (dist < mace_head_radius + axe_head_radius)
-				printf("COLLIDE\n");
 		}
 
 
