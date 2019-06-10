@@ -481,6 +481,7 @@ public:
 };
 
 vec3 handPose;
+vec3 eyePose;
 mat4 rot;
 bool pressedA = false;
 bool pressedB = false;
@@ -770,6 +771,8 @@ protected:
 			const auto& vp = _sceneLayer.Viewport[eye];
 			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+
+			eyePose = ovr::toGlm(eyePoses[eye].Position);
 			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
 		});
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
@@ -973,7 +976,7 @@ public:
 		glUseProgram(shaderID);
 		skybox->draw(shaderID, projection, view);
 
-		glDepthMask(GL_TRUE);
+		//glDepthMask(GL_TRUE);
 		glUseProgram(secondShader);
 
 		glm::mat4 sphereToWorld;
@@ -1042,80 +1045,97 @@ public:
 
 
 		//Drawing the weapons
-		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[0]) * axe_rots[0] * glm::translate(-axe_handle) * axes[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+			//set up uniforms
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view)[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
+		glUniform3fv(glGetUniformLocation(secondShader, "lightPos"), 1, &(vec3(0,0,20))[0]);
+		glUniform3fv(glGetUniformLocation(secondShader, "viewPos"), 1, &(eyePose)[0]);
+		glUniform3fv(glGetUniformLocation(secondShader, "lightColor"), 1, &(vec3(1, 1, 1))[0]);
+
+			//axe
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 0, 0))[0]); 
+		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[0]) * axe_rots[0] * glm::translate(-axe_handle) * axes[0];
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		axe->Draw(secondShader);
 
 		sphereToWorld = glm::translate(glm::mat4(1.0), axe_pos[1]) * axe_rots[1] * glm::translate(-axe_handle) * axes[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "projection"), 1, GL_FALSE, &(projection)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		axe->Draw(secondShader);
 
+			//mace
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 1, 0))[0]);
 		sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[0]) * mace_rots[0] * glm::translate(-mace_handle) * maces[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		mace->Draw(secondShader);
 
 		sphereToWorld = glm::translate(glm::mat4(1.0), mace_pos[1]) * mace_rots[1] * glm::translate(-mace_handle) * maces[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		mace->Draw(secondShader);
 
+			//sword
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 0, 1))[0]);
 		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[0]) * sword_rots[0] * glm::translate(-sword_handle) * swords[0];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		sword->Draw(secondShader);
 
 		sphereToWorld = glm::translate(glm::mat4(1.0), sword_pos[1]) * sword_rots[1] * glm::translate(-sword_handle) * swords[1];
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		sword->Draw(secondShader);
 
 		//Hand
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
 		sphereToWorld = glm::translate(handPose) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * glm::mat4(1);
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sphereToWorld)[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sphereToWorld)[0][0]);
 		sphere->Draw(secondShader);
 
 		//Mace sphere
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
 		mace_sphere[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_sphere[0])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[0])[0][0]);
 		sphere->Draw(secondShader);
 
 		mace_sphere[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_sphere[1])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		//Mace collision
 		mace_collision[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_collision[0])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[0])[0][0]);
 		sphere->Draw(secondShader);
 
 		mace_collision[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * mace_collision[1])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		//Sword sphere
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
 		sword_sphere[0] = glm::translate(sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sword_sphere[0])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[0])[0][0]);
 		sphere->Draw(secondShader);
 
 		sword_sphere[1] = glm::translate(sword_pos[1]) * sword_rots[1] * sword_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * sword_sphere[1])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[1])[0][0]);
 		sphere->Draw(secondShader);
 
+		//Sword collision
+
 		//Axe sphere
+		glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
 		axe_sphere[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_sphere[0])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[0])[0][0]);
 		sphere->Draw(secondShader);
 
 		axe_sphere[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_sphere_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_sphere[1])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		//Axe collision
 		axe_collision[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_collision[0])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[0])[0][0]);
 		sphere->Draw(secondShader);
 
 		axe_collision[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_collision_trans;
-		glUniformMatrix4fv(glGetUniformLocation(secondShader, "view"), 1, GL_FALSE, &(view * axe_collision[1])[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[1])[0][0]);
 		sphere->Draw(secondShader);
 
 		prev_frame_idx = pressedRIdx;
