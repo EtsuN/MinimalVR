@@ -57,11 +57,11 @@ public:
 	float handScale = 0.05;
 	float headScale = 0.2;
 
-	Player(glm::mat4 M, bool isMe, Model* sphere) {
+	Player(glm::mat4 M, bool isMe, Model* sphere, Model* headModel) {
 		toWorld = M;
 		isMe = isMe;
 		handSphere = sphere;
-		head = nullptr; //TODO
+		head = headModel;
 		heldWeapon = -1;
 		headToPlayer = glm::mat4(1);
 		rhandToPlayer = glm::translate(glm::mat4(1), glm::vec3(1, -1, 0));

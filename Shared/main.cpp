@@ -49,11 +49,14 @@ limitations under the License.
 #include "Cube.h"
 #include "Model.h"
 #include "Player.h"
+#include "AudioEngine.h"
 
 Player* me;
 Player* oppo;
 
 Model* sphere;
+
+CAudioEngine aEngine;
 
 // Import the most commonly used types into the default namespace
 using glm::ivec3;
@@ -256,9 +259,9 @@ public:
 		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player( (player_num == 1) ? player1 : player2,
-			true, sphere);
+			true, sphere, (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
 		oppo = new Player((player_num == 1) ? player2 : player1 ,
-			false, sphere);
+			false, sphere, (player_num == 1) ? new Model("../Shared/head/asianguy.obj") : new Model("../Shared/head/whiteguy.obj"));
 
 
 		while (!glfwWindowShouldClose(window))
@@ -588,110 +591,7 @@ public:
 	}
 
 protected:
-	void update() final override {
-
-
-		ovrInputState inputState;
-		ovrTrackingState trackState = ovr_GetTrackingState(_session, 0.01, ovrTrue);
-
-		ovrPosef handPoses[2];
-		handPoses[0] = trackState.HandPoses[0].ThePose;
-		handPoses[1] = trackState.HandPoses[1].ThePose;
-		ovrVector3f handPosition[2];
-		handPosition[0] = handPoses[0].Position;
-		handPosition[1] = handPoses[1].Position;
-
-		rot = mat4(mat3(me->toWorld)) * glm::toMat4(ovr::toGlm(handPoses[1].Orientation));
-		handPose =  me->getRHandPose() * vec4(0,0,0,1);
-
-		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
-
-		PlayerInfo op = run_client(*(me->getPlayerInfo()));
-		oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
-		oppo_rot = mat3(op.rhandInWorld);
-		oppo_handPose = op.rhandInWorld * vec4(0, 0, 0, 1);
-		oppo->heldWeapon = op.heldWeapon;
-
-		printf("ME: %d\n", me->heldWeapon);
-		printf("MYWEAPON: %d\n", weapon_p1);
-		printf("OPPO: %d\n", op.heldWeapon);
-
-
-		if (player_num == 1) {
-			switch (op.heldWeapon) {
-			case 1:
-				weapon_p2 = a_axe;
-				break;
-			case 3:
-				weapon_p2 = a_mace;
-				break;
-			case 5:
-				weapon_p2 = a_sword;
-				break;
-			case -1:
-				weapon_p2 = a_none;
-				break;
-			}
-		}
-
-		else {
-			switch (op.heldWeapon) {
-			case 0:
-				weapon_p2 = a_axe;
-				break;
-			case 2:
-				weapon_p2 = a_mace;
-				break;
-			case 4:
-				weapon_p2 = a_sword;
-				break;
-			case -1:
-				weapon_p2 = a_none;
-				break;
-			}
-		}
-		
-		if (player_num == 1) {
-			switch (weapon_p1) {
-			case a_axe:
-				me->heldWeapon = 0;
-				break;
-			case a_mace:
-				me->heldWeapon = 2;
-				break;
-			case a_sword:
-				me->heldWeapon = 4;
-				break;
-			case a_none:
-				me->heldWeapon = -1;
-				break;
-			}
-		}
-
-		else {
-			switch (weapon_p1) {
-			case a_axe:
-				me->heldWeapon = 1;
-				break;
-			case a_mace:
-				me->heldWeapon = 3;
-				break;
-			case a_sword:
-				me->heldWeapon = 5;
-				break;
-			case a_none:
-				me->heldWeapon = -1;
-				break;
-			}
-		}
-
-
-
-		for (int i = 0; i < 6; i++) {
-			weapon_state[i] = weapons[i];
-		}
-
-
+	void handleInput(ovrInputState inputState) {
 		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
 			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)
 			std::cerr << "right middle trigger pressed" << std::endl;
@@ -794,6 +694,32 @@ protected:
 			//pressedRHnd = false;
 			//pressedLHnd = false;
 		}
+	}
+
+	void update() final override {
+
+		ovrInputState inputState;
+		ovrTrackingState trackState = ovr_GetTrackingState(_session, 0.01, ovrTrue);
+
+		// handle button press
+		handleInput(inputState);
+
+
+		ovrPosef handPoses[2];
+		handPoses[0] = trackState.HandPoses[0].ThePose;
+		handPoses[1] = trackState.HandPoses[1].ThePose;
+		ovrVector3f handPosition[2];
+		handPosition[0] = handPoses[0].Position;
+		handPosition[1] = handPoses[1].Position;
+
+		rot = mat4(mat3(me->toWorld)) * glm::toMat4(ovr::toGlm(handPoses[1].Orientation));
+		handPose =  me->getRHandPose() * vec4(0,0,0,1);
+
+		me->updatePlayer(ovr::toGlm(trackState.HeadPose.ThePose), ovr::toGlm(handPoses[1]), ovr::toGlm(handPoses[0]));
+
+		std::async(run_client, *(me->getPlayerInfo()), oppo);
+		
+		
 	}
 
 	GLFWwindow* createRenderingTarget(uvec2& outSize, ivec2& outPosition) override
@@ -1313,18 +1239,51 @@ protected:
 	}
 };
 
+void AudioUpdate(CAudioEngine* engine) {
+	while (1) {
+		engine->Update();
+	}
+}
+
 // Execute our example class
 int main(int argc, char** argv)
 {
 	int result = -1;
+	/*
+	aEngine.Init();
 
+	aEngine.LoadSound("nature.mp3", false); //for now
+	aEngine.LoadSound("hold-weapon.mp3", false); //for now
+	aEngine.LoadSound("weapon-collide.mp3", false); //for now
+	aEngine.LoadSound("scream.mp3", false); //for now
+	aEngine.PlaySounds("nature.mp3", vec3(0), aEngine.VolumeTodB(0.2f));
 
+	future<void> audioFuture = async(AudioUpdate, &aEngine);
+
+	string input;
+	while (std::getline(std::cin, input))
+	{
+		if (input.compare("h") == 0)
+		{
+			aEngine.PlaySounds("hold-weapon.mp3", vec3(0), aEngine.VolumeTodB(1.0f));
+		}
+		else if(input.compare("c") == 0)
+		{
+			aEngine.PlaySounds("weapon-collide.mp3", vec3(0), aEngine.VolumeTodB(1.0f));
+		}
+		else if (input.compare("s") == 0)
+		{
+			aEngine.PlaySounds("scream.mp3", vec3(0), aEngine.VolumeTodB(0.5f));
+		}
+	}
+	*/
 	if (!OVR_SUCCESS(ovr_Initialize(nullptr)))
 	{
 		FAIL("Failed to initialize the Oculus SDK");
 	}
 	result = ExampleApp().run();
 
+	aEngine.Shutdown();
 	ovr_Shutdown();
 	return result;
 }
