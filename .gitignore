@@ -16,9 +16,9 @@
 [Dd]ebug/*
 !preprocessor/[Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+#[Rr]elease/
 [Rr]eleases/
-x64/
+#x64/
 x86/
 #!preprocessor/debug/*
 #!architecture/x86/*
