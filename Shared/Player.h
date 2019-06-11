@@ -88,7 +88,7 @@ public:
 		if (!isMe) {
 			glUniform3fv(glGetUniformLocation(shader, "objectColor"), 1, &(glm::vec3(1, 1, 1))[0]);
 			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &(getHeadPose() * glm::scale(glm::mat4(1), glm::vec3(headScale)))[0][0]);
-			handSphere->Draw(shader);
+			head->Draw(shader);
 		}
 
 		//Left Hand
