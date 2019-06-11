@@ -4,14 +4,24 @@ uniform vec3 lightPos;
 uniform vec3 viewPos; 
 uniform vec3 lightColor;
 uniform vec3 objectColor;
+uniform int transparent;
 
 in vec3 vertNormal;
 in vec3 vertPosition; 
+in vec2 vertTexture;
 
 out vec4 fragColor;
 
+uniform sampler2D texture_diffuse1;
+
 void main()
 {
+	if (transparent > 0) {
+		fragColor = vec4(objectColor, 0.4);
+		return;
+	}
+
+	vec3 color = vec3(texture(texture_diffuse1, vertTexture));
 
 	// ambient
     float ambientStrength = 0.1;
@@ -32,7 +42,9 @@ void main()
         
     vec3 result = (ambient + diffuse + specular) * objectColor;
     fragColor = vec4(result, 1.0);
-
+	
+	//color = (ambient + diffuse + specular) * color;
+	//fragColor = vec4(color, 1.0);
 
 
 	// old codes

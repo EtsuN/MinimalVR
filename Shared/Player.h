@@ -23,7 +23,7 @@ struct PlayerInfo {
 	}
 
 
-	MSGPACK_DEFINE_MAP(heldWeapon,
+	MSGPACK_DEFINE_MAP(dead, heldWeapon,
 		headInWorld[0][0], headInWorld[0][1], headInWorld[0][2], headInWorld[0][3],
 		headInWorld[1][0], headInWorld[1][1], headInWorld[1][2], headInWorld[1][3],
 		headInWorld[2][0], headInWorld[2][1], headInWorld[2][2], headInWorld[2][3],
@@ -68,7 +68,7 @@ public:
 
 	Player(glm::mat4 M, bool isMe, Model* sphere, Model* headModel) {
 		toWorld = M;
-		isMe = isMe;
+		this->isMe = isMe;
 		handSphere = sphere;
 		head = headModel;
 		heldWeapon = -1;
@@ -96,7 +96,8 @@ public:
 		//Head 
 		if (!isMe) {
 			glUniform3fv(glGetUniformLocation(shader, "objectColor"), 1, &(glm::vec3(1, 1, 1))[0]);
-			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &(getHeadPose() * glm::scale(glm::mat4(1), glm::vec3(headScale)))[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &(getHeadPose() 
+				* glm::scale(glm::mat4(1), glm::vec3(headScale)) * glm::rotate(glm::mat4(1), glm::pi<float>(), glm::vec3(0, 1, 0))    )[0][0]);
 			head->Draw(shader);
 		}
 

@@ -243,3 +243,8 @@ float  CAudioEngine::VolumeTodB(float volume)
 void CAudioEngine::Shutdown() {
 	delete sgpImplementation;
 }
+
+void CAudioEngine::Set3dListenerAndOrientation(const glm::vec3&vPosition, const glm::vec3&vLook, const glm::vec3& vUp) {
+	sgpImplementation->mpSystem->set3DListenerAttributes(0, &VectorToFmod(vPosition), &VectorToFmod(glm::vec3(0)),
+		&VectorToFmod(vLook), &VectorToFmod(vUp));
+}

@@ -126,7 +126,7 @@ public:
 		for (int i = 0; i < 9; i++)
 			sword_collision_trans.push_back(glm::translate(sword_head + vec3(0, i / 15.0f, 0)) * glm::scale(vec3(sword_head_radius)));
 
-		head_radius = 1.0;
+		head_radius = 0.15;
 
 		for (int i = 0; i < 6; i++)
 			render_weapons.push_back(true);
@@ -145,7 +145,6 @@ public:
 	//check the interaction between the held weapon, and disable the rendering for the broken weapon
 	//TODO
 	void check_interaction(int weapon1, int weapon2) {
-		printf("hola");
 		if (weapon1 == -1 || weapon2 == -1) return;
 		int type1 = weapon1 / 2;
 		int type2 = weapon2 / 2;
@@ -188,10 +187,19 @@ public:
 		bool weapon, player1_dead, player2_dead;
 		std::tie(weapon, player1_dead, player2_dead) = check_collision();
 		
-		if (player1_dead)
+		if (player1_dead) {
 			players[0].dead = 1;
-		else if (player2_dead)
+			players[1].dead = -1; // meaning he won
+			p.dead = players[player == 1 ? 0 : 1].dead;
+			//players[player == 1 ? 0 : 1] = p;
+		}
+		else if (player2_dead) {
+			//printf("PLAYER 2 DEAD");
 			players[1].dead = 1;
+			players[0].dead = -1;
+			p.dead = players[player == 1 ? 0 : 1].dead;
+			//players[player == 1 ? 0 : 1] = p;
+		}
 
 		if (weapon) { //TODO
 			check_interaction(players[0].heldWeapon, players[1].heldWeapon);
@@ -337,8 +345,10 @@ public:
 
 				if (player_1_weapon >= 4) {
 					float dist = shortest_distance(player_1_wpos, player_1_wrot, sword_collision_trans, vec4(player_2_head, 1));
-					if (dist < head_radius + sword_head_radius)
+					if (dist < head_radius + sword_head_radius) {
+						printf("hola2");
 						h2 = true;
+					}
 				}
 				else {
 					mat4 weapon_1_collision = glm::translate(player_1_wpos) * player_1_wrot * get_weapon_collision(player_1_weapon);

@@ -163,6 +163,7 @@
     <ClInclude Include="ServerClientConnection.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="TexturedCube.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

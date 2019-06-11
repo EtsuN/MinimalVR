@@ -7,10 +7,20 @@
 in vec3 TexCoords;
 
 uniform samplerCube skybox;
+uniform int playerStat;
 
 out vec4 fragColor;
 
 void main()
 {    
-    fragColor = texture(skybox, TexCoords);
+    vec4 color = texture(skybox, TexCoords);
+	if (playerStat > 0) { // you lose
+		color.y *= 0.5;
+		color.z *= 0.5;
+	}
+	else if (playerStat < 0) { // you win
+		color.x *= 0.7;
+		color.y *= 0.7;
+	}
+	fragColor = color;
 }

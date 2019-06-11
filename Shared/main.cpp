@@ -55,7 +55,7 @@ Player* me;
 Player* oppo;
 
 Model* sphere;
-
+bool gameOver = false;
 CAudioEngine aEngine;
 
 // Import the most commonly used types into the default namespace
@@ -254,14 +254,14 @@ public:
 
 		// initialize Players
 		sphere = new Model("../Shared/sphere2.obj");
-		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
-		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));
+		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5)) *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
+		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.5)) *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
 		//float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		//float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player((player_num == 1) ? player1 : player2,
-			true, sphere, sphere);// (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
+			true, sphere,  (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
 		oppo = new Player((player_num == 1) ? player2 : player1,
-			false, sphere, sphere);// (player_num == 1) ? new Model("../Shared/head/asianguy.obj") : new Model("../Shared/head/whiteguy.obj"));
+			false, sphere, (player_num == 1) ? new Model("../Shared/head/asianguy.obj") : new Model("../Shared/head/whiteguy.obj"));
 
 		while (!glfwWindowShouldClose(window))
 		{
@@ -615,8 +615,19 @@ protected:
 		//printf("MYWEAPON: %d\n", weapon_p1);
 		//printf("OPPO: %d\n", op.heldWeapon);
 		//PlayerInfo op = *(oppo->getPlayerInfo());
-
-		oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
+		if (op.headInWorld != mat4(1)) // when connected to opponent
+			oppo->updatePlayer(inverse(oppo->toWorld) * op.headInWorld, inverse(oppo->toWorld) * op.rhandInWorld, inverse(oppo->toWorld) * op.lhandInWorld);
+		oppo->info->dead = op.dead;
+		if (op.dead != 0) {
+			if (op.dead > 0)
+				me->info->dead = -1;
+			else
+				me->info->dead = 1;
+			if (!gameOver) {
+				aEngine.PlaySounds("scream.mp3", vec3(0), aEngine.VolumeTodB(0.5f));
+				gameOver = true;
+			}
+		}
 		oppo_rot = glm::mat3(op.rhandInWorld);
 		oppo_handPose = op.rhandInWorld * vec4(0, 0, 0, 1);
 		oppo->heldWeapon = op.heldWeapon;
@@ -689,10 +700,19 @@ protected:
 			}
 		}
 
-
+		int playCollisionSound = -1;
 		for (int i = 0; i < 6; i++) {
+			if (weapon_state[i] != weapons[i] ) {
+				playCollisionSound = i;	
+			}
 			weapon_state[i] = weapons[i];
 		}
+
+
+		if (playCollisionSound >= 0) {
+			aEngine.PlaySounds("weapon-collide.mp3", vec3(0), aEngine.VolumeTodB(1.0f));
+		}
+
 
 		if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &inputState))) {
 			/*if (inputState.HandTrigger[ovrHand_Right] > 0.5f)
@@ -1032,6 +1052,7 @@ public:
 		swords.push_back(glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)) * glm::mat4(1));
 		swords.push_back(glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0))* glm::rotate(270 * pi / 180.0f, vec3(1, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)) * glm::mat4(1));
 
+		/*
 		axe_pos.push_back(glm::vec3(0, 0, -0.4));
 		axe_pos.push_back(vec3(0, 0, -0.2));
 		axe_rots.push_back(mat4(1));
@@ -1044,6 +1065,23 @@ public:
 
 		sword_pos.push_back(glm::vec3(-0.3, 0, -0.4));
 		sword_pos.push_back(glm::vec3(-0.3, 0, -0.2));
+		sword_rots.push_back(mat4(1));
+		sword_rots.push_back(mat4(1));
+		*/
+
+
+		axe_pos.push_back(vec3( glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, 0.8)) * vec4(0, 0, 0, 1)));
+		axe_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, -0.8)) * vec4(0, 0, 0, 1)));
+		axe_rots.push_back(mat4(1));
+		axe_rots.push_back(mat4(1));
+
+		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, 0.8)) * vec4(0, 0, 0, 1)));
+		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, -0.8)) * vec4(0, 0, 0, 1)));
+		mace_rots.push_back(mat4(1));
+		mace_rots.push_back(mat4(1));
+
+		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, 0.8)) * vec4(0, 0, 0, 1)));
+		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, -0.8)) * vec4(0, 0, 0, 1)));
 		sword_rots.push_back(mat4(1));
 		sword_rots.push_back(mat4(1));
 
@@ -1092,6 +1130,14 @@ public:
 
 		// Render Skybox : remove view translation
 		glUseProgram(shaderID);
+		int playerStat = 0;
+		if (op.dead == 1)
+			playerStat = -1;
+		if (op.dead == -1)
+			playerStat = 1;
+		if (gameOver)
+			printf("ya %d %d %d\n", op.dead, oppo->info->dead, me->info->dead);
+		glUniform1i(glGetUniformLocation(shaderID, "playerStat"), playerStat);
 		skybox->draw(shaderID, projection, view);
 
 
@@ -1105,6 +1151,14 @@ public:
 		else if (weapon_p1 == a_mace) {
 			mace_rots[(player_num == 1 ? 0 : 1)] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
 			mace_pos[(player_num == 1 ? 0 : 1)] = handPose - (mat3(mace_rots[player_num == 1 ? 0 : 1]) * mace_handle);
+			/*
+			int i = (player_num == 1 ? 0 : 1);
+
+			vec3 macecollisionpos = glm::translate(mace_pos[i]) * mace_rots[i] * mace_collision_trans * vec4(0,0,0,1);
+			float dist = glm::distance(vec3(op.headInWorld * vec4(0,0,0,1)), macecollisionpos);
+			
+			printf("%f\n", dist);*/
+
 		}
 
 		else if (weapon_p1 == a_sword) {
@@ -1131,20 +1185,24 @@ public:
 			float dist = glm::distance(handPose, vec3(axe_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
 				weapon_p1 = a_axe;
+				aEngine.PlaySounds("hold-weapon.mp3", vec3(axe_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)), aEngine.VolumeTodB(1.0f));
 			}
 
 			dist = glm::distance(handPose, vec3(mace_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
-			printf("%f\n", dist);
+			//printf("%f\n", dist);
 			if (dist < 0.04) {
 				weapon_p1 = a_mace;
+				aEngine.PlaySounds("hold-weapon.mp3", vec3(mace_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)), aEngine.VolumeTodB(1.0f));
+
 			}
 
 			dist = glm::distance(handPose, vec3(sword_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 			if (dist < 0.04) {
 				weapon_p1 = a_sword;
+				aEngine.PlaySounds("hold-weapon.mp3", vec3(sword_sphere[(player_num == 1 ? 0 : 1)] * vec4(0.0f, 0.0f, 0.0f, 1.0f)), aEngine.VolumeTodB(1.0f));
+
 			}
 		}
-
 		else if (!pressedRIdx) {
 			weapon_p1 = a_none;
 		}
@@ -1172,6 +1230,7 @@ public:
 		//Drawing the weapons
 		glUseProgram(secondShader);
 
+		vec3 sphereColor = vec3(0.5, 0.5, 1);
 
 		//axe
 		if (weapon_state[0] == true) {
@@ -1182,15 +1241,20 @@ public:
 
 
 			//Axe sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			axe_sphere[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[0])[0][0]);
 			sphere->Draw(secondShader);
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0); 
+			glDisable(GL_BLEND);
 
 			//Axe collision
 			axe_collision[0] = glm::translate(axe_pos[0]) * axe_rots[0] * axe_collision_trans;
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[0])[0][0]);
-			sphere->Draw(secondShader);
+			//sphere->Draw(secondShader);
 
 		}
 		if (weapon_state[1] == true) {
@@ -1200,15 +1264,20 @@ public:
 			axe->Draw(secondShader);
 
 			//Axe sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			axe_sphere[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_sphere[1])[0][0]);
 			sphere->Draw(secondShader);
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0);
+			glDisable(GL_BLEND);
 
 			//Axe collision
 			axe_collision[1] = glm::translate(axe_pos[1]) * axe_rots[1] * axe_collision_trans;
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(axe_collision[1])[0][0]);
-			sphere->Draw(secondShader);
+			//sphere->Draw(secondShader);
 		}
 
 		//mace
@@ -1219,15 +1288,21 @@ public:
 			mace->Draw(secondShader);
 
 			//Mace sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			mace_sphere[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[0])[0][0]);
 			sphere->Draw(secondShader);
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0);
+			glDisable(GL_BLEND);
+
 
 			//Mace collision
 			mace_collision[0] = glm::translate(mace_pos[0]) * mace_rots[0] * mace_collision_trans;
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[0])[0][0]);
-			sphere->Draw(secondShader);
+			//sphere->Draw(secondShader);
 		}
 		if (weapon_state[3] == true) {
 			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(0, 1, 0))[0]);
@@ -1236,15 +1311,20 @@ public:
 			mace->Draw(secondShader);
 
 			//Mace sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			mace_sphere[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_sphere[1])[0][0]);
 			sphere->Draw(secondShader);
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0);
+			glDisable(GL_BLEND);
 
 			//Mace collision
 			mace_collision[1] = glm::translate(mace_pos[1]) * mace_rots[1] * mace_collision_trans;
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(mace_collision[1])[0][0]);
-			sphere->Draw(secondShader);
+			//sphere->Draw(secondShader);
 		}
 
 		//sword
@@ -1255,11 +1335,15 @@ public:
 			sword->Draw(secondShader);
 
 			//Sword sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			sword_sphere[0] = glm::translate(sword_pos[0]) * sword_rots[0] * sword_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[0])[0][0]);
 			sphere->Draw(secondShader);
-
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0);
+			glDisable(GL_BLEND);
 
 			//Sword collision
 
@@ -1272,12 +1356,15 @@ public:
 			sword->Draw(secondShader);
 
 			//Sword sphere
-			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &(vec3(1, 1, 1))[0]);
+			glUniform3fv(glGetUniformLocation(secondShader, "objectColor"), 1, &sphereColor[0]);
 			sword_sphere[1] = glm::translate(sword_pos[1]) * sword_rots[1] * sword_sphere_trans;
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 1);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUniformMatrix4fv(glGetUniformLocation(secondShader, "model"), 1, GL_FALSE, &(sword_sphere[1])[0][0]);
 			sphere->Draw(secondShader);
-
-
+			glUniform1i(glGetUniformLocation(secondShader, "transparent"), 0);
+			glDisable(GL_BLEND);
 			//Sword collision
 		}
 
@@ -1319,7 +1406,12 @@ protected:
 
 void AudioUpdate(CAudioEngine* engine) {
 	while (1) {
-		engine->Update();
+		//engine->Update();
+		if (me != nullptr) {
+			vec3 listenerPos = vec3(me->getHeadPose() * vec4(0, 0, 0, 1));
+			vec3 listenerDir = normalize(vec3(me->getHeadPose() * vec4(0, 0, -1, 0))); // need to be normalized
+			engine->Set3dListenerAndOrientation(listenerPos, listenerDir, vec3(0, 1, 0));
+		}
 	}
 }
 
@@ -1327,17 +1419,18 @@ void AudioUpdate(CAudioEngine* engine) {
 int main(int argc, char** argv)
 {
 	int result = -1;
-	/*
+	
 	aEngine.Init();
 
-	aEngine.LoadSound("nature.mp3", false); //for now
-	aEngine.LoadSound("hold-weapon.mp3", false); //for now
-	aEngine.LoadSound("weapon-collide.mp3", false); //for now
-	aEngine.LoadSound("scream.mp3", false); //for now
-	aEngine.PlaySounds("nature.mp3", vec3(0), aEngine.VolumeTodB(0.2f));
+	aEngine.LoadSound("nature.mp3", true, true); 
+	aEngine.LoadSound("hold-weapon.mp3", true);
+	aEngine.LoadSound("weapon-collide.mp3", true);
+	aEngine.LoadSound("scream.mp3", true);
+
+	aEngine.PlaySounds("nature.mp3", vec3(0), aEngine.VolumeTodB(0.5f));
 
 	future<void> audioFuture = async(AudioUpdate, &aEngine);
-
+	/*
 	string input;
 	while (std::getline(std::cin, input))
 	{
@@ -1353,7 +1446,8 @@ int main(int argc, char** argv)
 		{
 			aEngine.PlaySounds("scream.mp3", vec3(0), aEngine.VolumeTodB(0.5f));
 		}
-	}*/
+	}
+	*/
 
 	if (!OVR_SUCCESS(ovr_Initialize(nullptr)))
 	{

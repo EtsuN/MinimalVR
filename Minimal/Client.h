@@ -39,10 +39,7 @@ void run_client(Player* me, Player * oppo)
 {
 	PlayerInfo* myInfo = me->getPlayerInfo();
 	std::tie(op, weapons) = c->call("push", *myInfo, player_num).get().as<std::tuple<PlayerInfo, vector<bool>>/*cast back the respond message to string and Player*/>();
-
-
-
-
+	
 	//printf("ME: %d\n", me->heldWeapon);
 	//printf("MYWEAPON: %d\n", weapon_p1);
 	//printf("OPPO: %d\n", op.heldWeapon);
