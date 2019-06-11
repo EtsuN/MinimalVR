@@ -259,9 +259,9 @@ public:
 		//float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
 		//float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player((player_num == 1) ? player1 : player2,
-			true, sphere,  (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
+			true, sphere,  (player_num == 1) ? new Model("../Shared/head/asianguy.obj") : new Model("../Shared/head/whiteguy.obj"));
 		oppo = new Player((player_num == 1) ? player2 : player1,
-			false, sphere, (player_num == 1) ? new Model("../Shared/head/asianguy.obj") : new Model("../Shared/head/whiteguy.obj"));
+			false, sphere, (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
 
 		while (!glfwWindowShouldClose(window))
 		{
@@ -1070,18 +1070,18 @@ public:
 		*/
 
 
-		axe_pos.push_back(vec3( glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, 0.8)) * vec4(0, 0, 0, 1)));
-		axe_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, -0.8)) * vec4(0, 0, 0, 1)));
+		axe_pos.push_back(vec3( glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, 0.7)) * vec4(0, 0, 0, 1)));
+		axe_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0, 0.0, -0.7)) * vec4(0, 0, 0, 1)));
 		axe_rots.push_back(mat4(1));
 		axe_rots.push_back(mat4(1));
 
-		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, 0.8)) * vec4(0, 0, 0, 1)));
-		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, -0.8)) * vec4(0, 0, 0, 1)));
+		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, 0.7)) * vec4(0, 0, 0, 1)));
+		mace_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(0.2, 0.10, -0.7)) * vec4(0, 0, 0, 1)));
 		mace_rots.push_back(mat4(1));
 		mace_rots.push_back(mat4(1));
 
-		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, 0.8)) * vec4(0, 0, 0, 1)));
-		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, -0.8)) * vec4(0, 0, 0, 1)));
+		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, 0.7)) * vec4(0, 0, 0, 1)));
+		sword_pos.push_back(vec3(glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), glm::vec3(-0.2, 0.1, -0.7)) * vec4(0, 0, 0, 1)));
 		sword_rots.push_back(mat4(1));
 		sword_rots.push_back(mat4(1));
 
