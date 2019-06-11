@@ -59,15 +59,15 @@ private:
 	vector<mat4> mace_rots;
 	vector<mat4> sword_rots;
 
-	int player_1_weapon;
-	int player_2_weapon;
+	int player_1_weapon = -1;
+	int player_2_weapon = -1;
 
 	vec3 player_1_head;
 	vec3 player_2_head;
 
 	mat4 player_trans;
 
-	float head_radius;
+	float head_radius; //TODO update it
 
 	float pi = 3.141592653589793;
 public:
@@ -75,6 +75,13 @@ public:
 	vector<bool> render_weapons;
 
 	Scene() {
+		players[0] = PlayerInfo();
+		players[0].heldWeapon = -1;
+		players[1] = PlayerInfo();
+		players[1].heldWeapon = -1;
+
+
+
 		axe_handle = vec3(0, -0.1, -0.01);
 		mace_handle = vec3(0.005, -0.2, 0);
 		sword_handle = vec3(-0.005, -0.22, 0);
@@ -138,6 +145,7 @@ public:
 	//check the interaction between the held weapon, and disable the rendering for the broken weapon
 	//TODO
 	void check_interaction(int weapon1, int weapon2) {
+		printf("hola");
 		if (weapon1 == -1 || weapon2 == -1) return;
 		int type1 = weapon1 / 2;
 		int type2 = weapon2 / 2;
@@ -167,19 +175,19 @@ public:
 		if (player == 1) {
 			player_1_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
 			player_1_weapon = p.heldWeapon;
-			update_weapon(player_1_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+			update_weapon(player_1_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), mat3( p.rhandInWorld));
 			players[0] = p;
 		}
 
 		if (player == 2) {
 			player_2_head = vec3(p.headInWorld * vec4(0, 0, 0, 1));
 			player_2_weapon = p.heldWeapon;
-			update_weapon(player_2_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), p.rhandInWorld);
+			update_weapon(player_2_weapon, p.rhandInWorld * vec4(0, 0, 0, 1), mat3(p.rhandInWorld));
 			players[1] = p;
 		}
 		bool weapon, player1_dead, player2_dead;
 		std::tie(weapon, player1_dead, player2_dead) = check_collision();
-
+		
 		if (player1_dead)
 			players[0].dead = 1;
 		else if (player2_dead)
@@ -196,26 +204,38 @@ public:
 		case 0:
 			axe_pos[weapon_ix] = pos;
 			axe_rots[weapon_ix] = rot;
+			axe_rots[weapon_ix] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[weapon_ix] = pos - (mat3(axe_rots[weapon_ix]) * axe_handle);
 			break;
 		case 1:
 			axe_pos[weapon_ix] = pos;
 			axe_rots[weapon_ix] = rot;
+			axe_rots[weapon_ix] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			axe_pos[weapon_ix] = pos - (mat3(axe_rots[weapon_ix]) * axe_handle);
 			break;
 		case 2:
 			mace_pos[weapon_ix - 2] = pos;
 			mace_rots[weapon_ix - 2] = rot;
+			mace_rots[weapon_ix - 2] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			mace_pos[weapon_ix - 2] = pos - (mat3(mace_rots[weapon_ix - 2]) * mace_handle);
 			break;
 		case 3:
 			mace_pos[weapon_ix - 2] = pos;
 			mace_rots[weapon_ix - 2] = rot;
+			mace_rots[weapon_ix - 2] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			mace_pos[weapon_ix - 2] = pos - (mat3(mace_rots[weapon_ix - 2]) * mace_handle);
 			break;
 		case 4:
 			sword_pos[weapon_ix - 4] = pos;
 			sword_rots[weapon_ix - 4] = rot;
+			sword_rots[weapon_ix - 4] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			sword_pos[weapon_ix - 4] = pos - (mat3(sword_rots[weapon_ix - 4]) * sword_handle);
 			break;
 		case 5:
 			sword_pos[weapon_ix - 4] = pos;
 			sword_rots[weapon_ix - 4] = rot;
+			sword_rots[weapon_ix - 4] = rot * glm::rotate(-90 * pi / 180.0f, vec3(0, 1, 0)) * glm::rotate(30 * pi / 180.0f, vec3(0, 0, 1));
+			sword_pos[weapon_ix - 4] = pos - (mat3(sword_rots[weapon_ix - 4]) * sword_handle);
 			break;
 		default:
 			break;
@@ -286,7 +306,9 @@ public:
 
 	//Collision of weapons, with player_1_head and with player_2_head
 	std::tuple<bool, bool, bool> check_collision() {
-		bool w, h1, h2 = false;
+		bool w = false;
+		bool h1 = false;
+		bool h2 = false;
 
 		if (player_1_weapon == -1 || player_2_weapon == -1) {
 			if (player_2_weapon != -1) {
@@ -330,6 +352,8 @@ public:
 			return std::tuple<bool, bool, bool>(w, h1, h2);
 		}
 
+		float dist;
+
 		if (player_1_weapon < 4 && player_2_weapon < 4) {
 			std::pair<vec3, mat4> ret = get_pos_and_rot(player_1_weapon);
 			vec3 player_1_wpos = ret.first;
@@ -342,7 +366,8 @@ public:
 			mat4 weapon_1_collision = glm::translate(player_1_wpos) * player_1_wrot * get_weapon_collision(player_1_weapon);
 			mat4 weapon_2_collision = glm::translate(player_2_wpos) * player_2_wrot * get_weapon_collision(player_2_weapon);
 
-			float dist = distance(weapon_1_collision * vec4(0, 0, 0, 1), weapon_2_collision * vec4(0, 0, 0, 1));
+			dist = distance(weapon_1_collision * vec4(0, 0, 0, 1), weapon_2_collision * vec4(0, 0, 0, 1));
+			printf("%f\n", dist);
 			if (dist < get_weapon_radius(player_1_weapon) + get_weapon_radius(player_2_weapon)) {
 				//printf("WEAPONS COLLIDE");
 				w = true;
@@ -370,8 +395,6 @@ public:
 					vec3 player_2_wpos = ret.first;
 					mat4 player_2_wrot = ret.second;
 
-					float dist;
-
 					for (int i = 0; i < 9; i++) {
 						dist = shortest_distance(player_1_wpos, player_1_wrot, sword_collision_trans, translate(player_2_wpos) * player_2_wrot * sword_collision_trans[i] * vec4(0, 0, 0, 1));
 						if (dist < 2 * sword_head_radius) {
@@ -379,7 +402,7 @@ public:
 							break;
 						}
 					}
-
+					
 					dist = shortest_distance(player_1_wpos, player_1_wrot, sword_collision_trans, vec4(player_2_head, 1));
 					if (dist < head_radius + sword_head_radius)
 						h2 = true;
@@ -396,8 +419,6 @@ public:
 					ret = get_pos_and_rot(player_2_weapon);
 					vec3 player_2_wpos = ret.first;
 					mat4 player_2_wrot = ret.second;
-
-					float dist;
 
 					vec4 weapon_2_collision = translate(player_2_wpos) * player_2_wrot * get_weapon_collision(player_2_weapon) * vec4(0, 0, 0, 1);
 
@@ -425,15 +446,12 @@ public:
 				vec3 player_2_wpos = ret.first;
 				mat4 player_2_wrot = ret.second;
 
-				float dist;
-
 				vec4 weapon_1_collision = translate(player_1_wpos) * player_1_wrot * get_weapon_collision(player_1_weapon) * vec4(0, 0, 0, 1);
 
 				dist = shortest_distance(player_2_wpos, player_2_wrot, sword_collision_trans, weapon_1_collision);
 				if (dist < sword_head_radius + get_weapon_radius(player_1_weapon)) {
 					w = true;
 				}
-
 				dist = shortest_distance(player_2_wpos, player_2_wrot, sword_collision_trans, vec4(player_1_head, 1));
 				if (dist < head_radius + sword_head_radius)
 					h1 = true;
@@ -443,6 +461,7 @@ public:
 					h2 = true;
 			}
 		}
+		
 		return std::tuple<bool, bool, bool>(w, h1, h2);
 	}
 };

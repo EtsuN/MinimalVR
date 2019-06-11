@@ -9,10 +9,19 @@
 #include "rpc/client.h"
 struct PlayerInfo {
 	int dead = 0;
-	int heldWeapon;
+	int heldWeapon = -1;
 	glm::mat4 headInWorld;
 	glm::mat4 rhandInWorld;
 	glm::mat4 lhandInWorld;
+
+	PlayerInfo() {
+		dead = 0;
+		heldWeapon = -1;
+		headInWorld = glm::mat4(1);
+		rhandInWorld = glm::mat4(1);
+		lhandInWorld = glm::mat4(1);
+	}
+
 
 	MSGPACK_DEFINE_MAP(heldWeapon,
 		headInWorld[0][0], headInWorld[0][1], headInWorld[0][2], headInWorld[0][3],

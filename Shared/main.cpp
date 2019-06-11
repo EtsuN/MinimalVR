@@ -256,8 +256,8 @@ public:
 		sphere = new Model("../Shared/sphere2.obj");
 		glm::mat4 player1 = glm::rotate(mat4(1), glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));// *glm::rotate(mat4(1), glm::pi<float>(), vec3(0, 1, 0));
 		glm::mat4 player2 = glm::rotate(mat4(1), -glm::pi<float>() / 2.0f, vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, 0.75));
-		float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
-		float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
+		//float playerOffset = (player_num == 1) ? 5.0f : -5.0f;
+		//float playerDir = (player_num == 1) ? glm::pi<float>() / 2.0f : -glm::pi<float>() / 2.0f;
 		me = new Player((player_num == 1) ? player1 : player2,
 			true, sphere, sphere);// (player_num == 1) ? new Model("../Shared/head/whiteguy.obj") : new Model("../Shared/head/asianguy.obj"));
 		oppo = new Player((player_num == 1) ? player2 : player1,
@@ -874,6 +874,7 @@ protected:
 			{
 			case GLFW_KEY_R:
 				ovr_RecenterTrackingOrigin(_session);
+
 				return;
 			}
 
